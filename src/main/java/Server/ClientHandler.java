@@ -7,6 +7,8 @@ import java.net.Socket;
 import java.util.List;
 import java.util.Scanner;
 
+import static java.lang.Thread.sleep;
+
 public class ClientHandler {
     private final Socket socket;
     private final ChatServer server;
@@ -14,8 +16,11 @@ public class ClientHandler {
     private final DataInputStream in;
     private final DataOutputStream out;
     private AuthService authService;
+    private boolean isConnected;
 
     public ClientHandler(Socket socket, ChatServer server, AuthService authService) {
+
+
 
         try {
             this.socket = socket;
@@ -41,7 +46,7 @@ public class ClientHandler {
         try {
             while (true) {
                 String msg = in.readUTF();
-                if ("/end".equals(msg)){
+                if ("/end".equals(msg)) {
                     break;
                 }
 
@@ -63,7 +68,7 @@ public class ClientHandler {
                 //Более сложный способ, на неограниченное чило клиентов (конечно, можно еще причесать код)))
 
                 if (msg.length() > 7) {
-                    Scanner s = new Scanner(msg.substring(msg.indexOf("k")+1));
+                    Scanner s = new Scanner(msg.substring(msg.indexOf("k") + 1));
                     List<ClientHandler> clients = server.getClients();
                     if (msg.startsWith("/w nick") && s.hasNextInt() && s.nextInt() <= clients.size()) { // startsWith проверяет только начало строки
                         s.close();
@@ -104,7 +109,6 @@ public class ClientHandler {
                     String login = s[1];
                     String password = s[2];
                     String nick = authService.getNickByLoginAndPassword(login, password);
-                    System.out.println(nick);
                     if (nick != null) {
                         if (server.isNickBusy(nick)) {
                             sendMessage("Пользователь уже авторизован");
@@ -113,6 +117,7 @@ public class ClientHandler {
                         sendMessage("/authok " + nick); // авторизация клиента отсюда
                         this.nick = nick;
                         server.broadcast("Пользователь " + nick + " вошел в чат");
+                        isConnected = true;
                         server.subscribe(this);
                         break;
                     }
@@ -126,21 +131,21 @@ public class ClientHandler {
     private void closeConnection() {
         sendMessage("/end");
         try {
-            if (in != null){
+            if (in != null) {
                 in.close();
             }
         } catch (IOException e) {
             throw new RuntimeException("Ошибка отключения", e);
         }
         try {
-            if (out != null){
+            if (out != null) {
                 out.close();
             }
         } catch (IOException e) {
             throw new RuntimeException("Ошибка отключения", e);
         }
         try {
-            if (socket != null){
+            if (socket != null) {
                 server.unsubscribe(this);
                 socket.close();
             }
@@ -152,7 +157,7 @@ public class ClientHandler {
     public void sendMessage(String message) {
         try {
             System.out.println("Отправляю сообщение: " + message);
-            if (nick != null && message.startsWith("/")){
+            if (nick != null && message.startsWith("/")) {
                 message = this.nick + ": " + message;
             }
             out.writeUTF(message);
