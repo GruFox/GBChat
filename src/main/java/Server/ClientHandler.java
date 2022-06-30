@@ -26,7 +26,7 @@ public class ClientHandler {
         // если клиент не авторизовался
         new Thread (() -> {
             try {
-                sleep(30000);
+                sleep(120000);
                 if (!isAuthenticated) {
                     closeConnection();
                     // код для остановки потоков и соединения
