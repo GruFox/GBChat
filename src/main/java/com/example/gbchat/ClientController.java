@@ -11,6 +11,7 @@ import java.io.IOException;
 public class ClientController {
 
     private final ChatClient client;
+
     @FXML
     private HBox loginBox;
     @FXML
@@ -58,5 +59,9 @@ public class ClientController {
     public void toggleBoxesVisibility(boolean isSuccess) {
         loginBox.setVisible(!isSuccess);
         messageBox.setVisible(isSuccess);
+    }
+
+    public HBox getLoginBox() {
+        return loginBox;
     }
 }

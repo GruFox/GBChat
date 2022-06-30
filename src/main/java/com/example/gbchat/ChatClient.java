@@ -37,7 +37,29 @@ public class ChatClient {
     }
 
     private void closeConnection() {
-
+        controller.getLoginBox().setVisible(false);
+        sendMessage("/end");
+        try {
+            if (in != null) {
+                in.close();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Ошибка отключения", e);
+        }
+        try {
+            if (out != null) {
+                out.close();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Ошибка отключения", e);
+        }
+        try {
+            if (socket != null) {
+                socket.close();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Ошибка отключения", e);
+        }
     }
 
     private void readMessage() {
@@ -51,6 +73,7 @@ public class ChatClient {
                 controller.addMessage(msg);
             } catch (IOException e) {
                 e.printStackTrace();
+                break;
             }
         }
     }
@@ -68,6 +91,7 @@ public class ChatClient {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+                break;
             }
         }
     }
