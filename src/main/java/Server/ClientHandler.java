@@ -1,5 +1,7 @@
 package Server;
 
+import com.example.gbchat.ClientController;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -16,11 +18,23 @@ public class ClientHandler {
     private final DataInputStream in;
     private final DataOutputStream out;
     private AuthService authService;
-    private boolean isConnected;
+    private boolean isAuthenticated;
 
     public ClientHandler(Socket socket, ChatServer server, AuthService authService) {
 
-
+        // считает 120 секунд
+        // если клиент не авторизовался
+        new Thread (() -> {
+            try {
+                sleep(120000);
+                if (!isAuthenticated) {
+                    closeConnection();
+                    // код для остановки потоков и соединения
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
 
         try {
             this.socket = socket;
@@ -117,13 +131,14 @@ public class ClientHandler {
                         sendMessage("/authok " + nick); // авторизация клиента отсюда
                         this.nick = nick;
                         server.broadcast("Пользователь " + nick + " вошел в чат");
-                        isConnected = true;
+                        isAuthenticated = true;
                         server.subscribe(this);
                         break;
                     }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+                break;
             }
         }
     }
