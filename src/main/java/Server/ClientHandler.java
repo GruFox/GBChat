@@ -15,6 +15,7 @@ public class ClientHandler {
     private final Socket socket;
     private final ChatServer server;
     private String nick;
+    private String login;       // НОВОЕ
     private final DataInputStream in;
     private final DataOutputStream out;
     private AuthService authService;
@@ -81,28 +82,38 @@ public class ClientHandler {
 
                 //Более сложный способ, на неограниченное чило клиентов (конечно, можно еще причесать код)))
 
-                if (msg.length() > 7) {
-                    Scanner s = new Scanner(msg.substring(msg.indexOf("k") + 1));
-                    List<ClientHandler> clients = server.getClients();
-                    if (msg.startsWith("/w nick") && s.hasNextInt() && s.nextInt() <= clients.size()) { // startsWith проверяет только начало строки
-                        s.close();
-                        String nick = msg.substring(3, msg.indexOf(" ", 4)); //вырезаем строку начиная с 3 индекса до пробела (3 вкл, пробел невкл)
-                        String message = msg.substring(msg.indexOf(" ", 4) + 1);
-                        int i = 0;
-                        while (!nick.equals(clients.get(i).getNick()) && i < clients.size() - 1) {
-                            i++;
-                        }
-                        if (nick.equals(clients.get(i).getNick())) {
-                            clients.get(i).sendMessage(message);
+                // /changeNick
 
-                        } else {
-                            System.out.println("Получено сообщение: " + msg); //проверка на случай если мы дошли до последней ячейки
-                            server.broadcast(msg);
-                        }
+
+
+                if (msg.length() > 7) {
+
+                    if (msg.startsWith("/changeNick ")) {
+                        String newNick = msg.substring(12);
+                        authService.changeNick(login, newNick);
                     } else {
-                        System.out.println("Получено сообщение: " + msg);
-                        server.broadcast(msg);
-                        s.close();
+                        Scanner s = new Scanner(msg.substring(msg.indexOf("k") + 1));
+                        List<ClientHandler> clients = server.getClients();
+                        if (msg.startsWith("/w nick") && s.hasNextInt() && s.nextInt() <= clients.size()) { // startsWith проверяет только начало строки
+                            s.close();
+                            String nick = msg.substring(3, msg.indexOf(" ", 4)); //вырезаем строку начиная с 3 индекса до пробела (3 вкл, пробел невкл)
+                            String message = msg.substring(msg.indexOf(" ", 4) + 1);
+                            int i = 0;
+                            while (!nick.equals(clients.get(i).getNick()) && i < clients.size() - 1) {
+                                i++;
+                            }
+                            if (nick.equals(clients.get(i).getNick())) {
+                                clients.get(i).sendMessage(message);
+
+                            } else {
+                                System.out.println("Получено сообщение: " + msg); //проверка на случай если мы дошли до последней ячейки
+                                server.broadcast(msg);
+                            }
+                        } else {
+                            System.out.println("Получено сообщение: " + msg);
+                            server.broadcast(msg);
+                            s.close();
+                        }
                     }
                 } else {
                     System.out.println("Получено сообщение: " + msg);
@@ -122,6 +133,7 @@ public class ClientHandler {
                     String[] s = msg.split(" "); // распилить там где пробел
                     String login = s[1];
                     String password = s[2];
+                    this.login = login;     // НОВОЕ
                     String nick = authService.getNickByLoginAndPassword(login, password);
                     if (nick != null) {
                         if (server.isNickBusy(nick)) {
@@ -132,7 +144,7 @@ public class ClientHandler {
                         this.nick = nick;
                         server.broadcast("Пользователь " + nick + " вошел в чат");
                         isAuthenticated = true;
-                        server.subscribe(this);
+                        server.subscribe(this); // подписать (то есть ClientHandler клиента добавить в список активных ClientHandlerов)
                         break;
                     }
                 }
@@ -180,6 +192,7 @@ public class ClientHandler {
             e.printStackTrace();
         }
     }
+
 
     public String getNick() {
         return nick;

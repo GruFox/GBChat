@@ -10,4 +10,6 @@ public interface AuthService extends Closeable {
 
     void close();
 
+    void changeNick(String login, String newNick);
+
 }

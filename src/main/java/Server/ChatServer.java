@@ -9,7 +9,7 @@ import java.util.List;
 public class ChatServer {
 
     private final AuthService authService;
-    private final List<ClientHandler> clients;
+    private final List<ClientHandler> clients; // перечень операторов
 
     public ChatServer() {
         clients = new ArrayList<>();
