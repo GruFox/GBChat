@@ -38,6 +38,7 @@ public class ClientController {
         }
     }
 
+
     public void authButtonClick(ActionEvent actionEvent) {
         client.sendMessage("/auth " + loginField.getText() + " " + passwordField.getText());
     }

@@ -82,10 +82,6 @@ public class ClientHandler {
 
                 //Более сложный способ, на неограниченное чило клиентов (конечно, можно еще причесать код)))
 
-                // /changeNick
-
-
-
                 if (msg.length() > 7) {
 
                     if (msg.startsWith("/changeNick ")) {

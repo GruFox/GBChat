@@ -24,9 +24,7 @@ public class ChatServer {
                 Socket socket = serverSocket.accept();
                 System.out.println("Клиент подключился");
                 new ClientHandler(socket, this, authService);
-
             }
-
         } catch (IOException e) {
             throw new RuntimeException("Ошибка сервера", e);
         }
