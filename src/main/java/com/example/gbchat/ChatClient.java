@@ -1,10 +1,10 @@
 package com.example.gbchat;
 
 import Server.ClientHandler;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.Socket;
 
 public class ChatClient {
@@ -12,11 +12,17 @@ public class ChatClient {
     private Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
-
     private ClientController controller;
+    private PrintWriter writer;
 
     public ChatClient(ClientController controller) {
         this.controller = controller;
+        try{
+            this.writer = new PrintWriter("/../../../history/chatLog.txt","UTF-8");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void openConnection() throws IOException {
@@ -68,6 +74,8 @@ public class ChatClient {
                     controller.toggleBoxesVisibility(false);
                     break;
                 }
+                writer.println(msg);
+                writer.flush();
                 controller.addMessage(msg);
             } catch (IOException e) {
                 e.printStackTrace();
