@@ -29,7 +29,7 @@ public class InMemoryAuthService implements AuthService {
             PreparedStatement statement = connection.prepareStatement("SELECT nick FROM users WHERE (login = ? AND password = ?)");
             statement.setString(1, login);
             statement.setString(2, password);
-            ResultSet result = statement.executeQuery();                           // execute означает выполнить
+            ResultSet result = statement.executeQuery();
             // в result содержится таблица:
             // NICK <- название столбца
             // nick2

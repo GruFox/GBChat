@@ -1,10 +1,10 @@
 package com.example.gbchat;
 
 import Server.ClientHandler;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.Socket;
 
 public class ChatClient {
@@ -12,7 +12,6 @@ public class ChatClient {
     private Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
-
     private ClientController controller;
 
     public ChatClient(ClientController controller) {
